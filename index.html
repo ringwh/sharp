@@ -1653,42 +1653,37 @@ function generateCardImage(callback) {
     function checkComplete() {
         loadedCount++;
         if (loadedCount === totalImages) {
-            // 所有图片加载完成，开始绘制
             drawCard();
         }
     }
     
     function drawCard() {
-    // 第一步：强制铺满不透明背景（解决透明边）
-    ctx.fillStyle = '#0A1628';
-    ctx.fillRect(0, 0, width, height);
-    
-    // 第二步：渐变背景（叠在上面）
-    const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, '#0A1628');
-    gradient.addColorStop(0.5, '#0B1A33');
-    gradient.addColorStop(1, '#0D1F3C');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-    
-    // ... 后面是星星、logo、文字、插画、二维码 ...
-}
+        // 第一步：强制铺满不透明背景（解决透明边）
+        ctx.fillStyle = '#0A1628';
+        ctx.fillRect(0, 0, width, height);
+        
+        // 第二步：渐变背景（叠在上面）
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, '#0A1628');
+        gradient.addColorStop(0.5, '#0B1A33');
+        gradient.addColorStop(1, '#0D1F3C');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
         
         // 重新画星星
         starPositions.forEach(function(pos) {
-            const x = pos[0], y = pos[1];
-            ctx.beginPath();
-            ctx.arc(x, y, 1.5 + Math.random() * 2, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,' + (0.2 + Math.random() * 0.5) + ')';
-            ctx.fill();
-        });
+    const x = pos[0], y = pos[1];
+    ctx.beginPath();
+    ctx.arc(x, y, 1.5 + Math.random() * 2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,' + (0.2 + Math.random() * 0.5) + ')';
+    ctx.fill();  // ← 加这一行
+});
         
-        // 绘制 Logo（顶部居中）
         // 绘制 Logo（保持原始宽高比）
-const logoWidth = 120;
-const logoHeight = logo.naturalHeight / logo.naturalWidth * logoWidth;
-const logoX = (width - logoWidth) / 2;
-ctx.drawImage(logo, logoX, 40, logoWidth, logoHeight);
+        const logoWidth = 120;
+        const logoHeight = logo.naturalHeight / logo.naturalWidth * logoWidth;
+        const logoX = (width - logoWidth) / 2;
+        ctx.drawImage(logo, logoX, 40, logoWidth, logoHeight);
         
         // 绘制标题
         ctx.fillStyle = '#FFFFFF';
@@ -1742,9 +1737,9 @@ ctx.drawImage(logo, logoX, 40, logoWidth, logoHeight);
         ctx.textBaseline = 'top';
         ctx.fillText('长按保存 · 分享你的投资星座', width/2, qrY + qrSize + 18);
         
-                // 转换为图片并回调
+        // 转换为图片并回调
         callback(canvas.toDataURL('image/png'));
-    }  // ← drawCard 函数结束
+    }
     
     logo.onload = checkComplete;
     logo.onerror = checkComplete;
@@ -1752,7 +1747,7 @@ ctx.drawImage(logo, logoX, 40, logoWidth, logoHeight);
     constellationImg.onerror = checkComplete;
     qrImg.onload = checkComplete;
     qrImg.onerror = checkComplete;
- // ← generateCardImage 函数结束
+}
 
 // roundRect 辅助方法（必须在 generateCardImage 外面）
 CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
