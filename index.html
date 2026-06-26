@@ -1693,26 +1693,26 @@ function generateCardImage(callback) {
         
         // 绘制标题
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 28px -apple-system, PingFang SC, sans-serif';
+        ctx.font = 'bold 32px -apple-system, PingFang SC, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-        ctx.fillText('8道题测出', width/2, 120);
-        ctx.fillText('你在投资上的星座', width/2, 160);
+        ctx.fillText('8道题测出', width/2, 140);
+        ctx.fillText('你在投资上的星座', width/2, 180);
         
         // 绘制 "我测出来是"
         ctx.fillStyle = 'rgba(255,255,255,0.35)';
         ctx.font = '18px -apple-system, PingFang SC, sans-serif';
-        ctx.fillText('我测出来是', width/2, 195);
+        ctx.fillText('我测出来是', width/2, 230);
         
         // 绘制星座名
         ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 40px -apple-system, PingFang SC, sans-serif';
-        ctx.fillText(constellationName + '座', width/2, 235);
+        ctx.fillText(constellationName + '座', width/2, 270);
         
         // 绘制星座插画
-        const imgSize = 200;
+        const imgSize = 240;
         const imgX = (width - imgSize) / 2;
-        const imgY = 310;
+        const imgY = 350;
         ctx.drawImage(constellationImg, imgX, imgY, imgSize, imgSize);
         
         // 绘制分割线
@@ -1720,13 +1720,13 @@ function generateCardImage(callback) {
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(80, 500);
-        ctx.lineTo(width - 80, 520);
+        ctx.lineTo(width - 80, 600);
         ctx.stroke();
         
         // 绘制二维码
         const qrSize = 100;
         const qrX = (width - qrSize) / 2;
-        const qrY = 550;
+        const qrY = 630;
         // 二维码白色背景
         ctx.fillStyle = '#FFFFFF';
         ctx.shadowColor = 'rgba(0,0,0,0.3)';
