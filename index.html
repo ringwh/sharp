@@ -1658,9 +1658,15 @@ function generateCardImage(callback) {
     }
     
     function drawCard() {
-        // 第一步：强制铺满不透明背景（解决透明边）
-        ctx.fillStyle = '#0A1628';
-        ctx.fillRect(0, 0, width, height);
+    // 等待所有图片加载完成
+    if (!logo.complete || !constellationImg.complete || !qrImg.complete) {
+        setTimeout(drawCard, 200);
+        return;
+    }
+    
+    // 第一步：强制铺满不透明背景（解决透明边）
+    ctx.fillStyle = '#0A1628';
+    ctx.fillRect(0, 0, width, height);
         
         // 第二步：渐变背景（叠在上面）
         const gradient = ctx.createLinearGradient(0, 0, 0, height);
