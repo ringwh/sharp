@@ -875,6 +875,8 @@
             }
         }
     </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+</script>
 </head>
 <body>
 
@@ -1321,7 +1323,7 @@
         //  8. 选择逻辑
         // ============================================================
         function selectOption(optKey) {
-            if (state.answered && state.selected[state.current] === optKey) return;
+            // 删掉这一行：if (state.answered && state.selected[state.current] === optKey) return;
 
             const idx = state.current;
 
@@ -1456,22 +1458,79 @@
         //  14. 分享弹窗控制
         // ============================================================
         function openShareModal() {
-            if (state.resultConst) {
-                const data = CONSTELLATIONS[state.resultConst];
-                if (data) {
-                    shareNameModal.textContent = state.resultConst + '座';
-                    shareImageModal.src = `images/${state.resultConst}.png`;
-                    shareImageModal.alt = `${state.resultConst}座插画`;
-                }
-            }
-            shareOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+    if (state.resultConst) {
+        const data = CONSTELLATIONS[state.resultConst];
+        if (data) {
+            shareNameModal.textContent = state.resultConst + '座';
+            shareImageModal.src = `images/${state.resultConst}.png`;
+            shareImageModal.alt = `${state.resultConst}座插画`;
         }
+    }
 
-        function closeShareModal() {
-            shareOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+    // 先显示弹窗
+    shareOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // 延迟生成卡片截图，确保 DOM 渲染完成
+    setTimeout(function() {
+        const card = document.getElementById('shareCardInner');
+        if (!card) return;
+        
+        // 移除二维码的 pointer-events: none 让截图正常
+        const qrImg = document.getElementById('shareQrLarge');
+        if (qrImg) qrImg.style.pointerEvents = 'none';
+        
+        html2canvas(card, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: null,
+            width: card.scrollWidth,
+            height: card.scrollHeight,
+            logging: false,
+            allowTaint: false,
+            useCORS: true
+        }).then(function(canvas) {
+            // 把卡片内容替换成截图图片
+            const cardInner = document.getElementById('shareCardInner');
+            // 清空卡片内部，只保留图片
+            cardInner.innerHTML = '';
+            // 创建一张图片显示截图
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL('image/png');
+            img.style.width = '100%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
+            img.style.borderRadius = '16px';
+            // 图片下方加一行提示
+            const hint = document.createElement('div');
+            hint.style.cssText = 'text-align:center;color:rgba(255,255,255,0.4);font-size:12px;padding:10px 0 4px;letter-spacing:0.5px;';
+            hint.textContent = '长按保存完整卡片 · 分享你的投资星座';
+            
+            // 重新添加关闭按钮（因为被清空了）
+            const closeBtn = document.querySelector('.share-modal .close-btn');
+            // 把图片和提示加到卡片里
+            cardInner.appendChild(img);
+            cardInner.appendChild(hint);
+            
+            // 关闭按钮还在，不用重新添加
+        }).catch(function(err) {
+            console.warn('截图失败:', err);
+            // 如果截图失败，显示提示
+            const cardInner = document.getElementById('shareCardInner');
+            cardInner.innerHTML = '<div style="color:rgba(255,255,255,0.5);padding:40px 20px;text-align:center;">生成卡片失败，请重试</div>';
+        });
+    }, 300);
+}
+
+       function closeShareModal() {
+    shareOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+    // 延迟重置卡片内容，让弹窗关闭后再恢复
+    setTimeout(function() {
+        // 重新加载页面或者直接刷新弹窗内容
+        location.reload(); // 简单粗暴，但能保证下次打开是原始卡片
+    }, 500);
+}
 
         shareBtn.addEventListener('click', openShareModal);
         shareCloseBtn.addEventListener('click', closeShareModal);
