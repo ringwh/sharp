@@ -1480,31 +1480,15 @@ function openShareModal() {
             btn.id = 'shareSaveBtn';
             btn.textContent = '保存到相册';
             btn.style.cssText = 'width:60%;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.15);border-radius:30px;padding:8px 0;color:#fff;font-size:12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;margin-top:12px;';
-           btn.onclick = function() {
-    // 获取按钮和它的父容器
-    const btnSave = document.getElementById('shareSaveBtn');
-    const shareBottom = document.querySelector('.share-modal .share-bottom');
-    
-    // 把按钮从 DOM 中移除（保存到变量里，以便后面恢复）
-    let savedBtn = null;
-    if (btnSave && btnSave.parentNode) {
-        savedBtn = btnSave.parentNode.removeChild(btnSave);
-    }
-    
-    // 只截取内容区域
-    const contentArea = document.querySelector('.share-modal .share-content');
-    html2canvas(contentArea, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: '#0A1628',
-    logging: false,
-    allowTaint: true
-}).then(function(canvas) {
-        // 截图完成后把按钮放回去
-        if (savedBtn && shareBottom) {
-            shareBottom.appendChild(savedBtn);
-        }
-        
+btn.onclick = function() {
+    const cardInner = document.getElementById('shareCardInner');
+    html2canvas(cardInner, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#0A1628',
+        logging: false,
+        allowTaint: true
+    }).then(function(canvas) {
         const link = document.createElement('a');
         link.download = '我的投资星座.png';
         link.href = canvas.toDataURL('image/png');
@@ -1516,10 +1500,6 @@ function openShareModal() {
             btn.style.borderColor = 'rgba(255,255,255,0.15)';
         }, 1500);
     }).catch(function(err) {
-        // 出错时也要把按钮放回去
-        if (savedBtn && shareBottom) {
-            shareBottom.appendChild(savedBtn);
-        }
         console.warn('截图失败:', err);
         alert('保存失败，请重试');
     });
