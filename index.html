@@ -1510,7 +1510,7 @@ function openShareModal() {
         }
     }
 }
-       function closeShareModal() {
+      function closeShareModal() {
     shareOverlay.classList.remove('active');
     document.body.style.overflow = '';
     // 恢复卡片为原始 HTML 结构
@@ -1528,7 +1528,7 @@ function openShareModal() {
                 <div class="share-bottom">
                     <img class="share-qr-large" id="shareQrLarge" src="qrcode.png" alt="二维码" onerror="this.style.display='none';document.getElementById('shareQrLargePlaceholder').style.display='flex'" />
                     <div class="share-qr-placeholder" id="shareQrLargePlaceholder" style="display:none;">二维码</div>
-                    <div class="share-bottom-hint">长按保存 · 分享你的投资星座</div>
+                    <div class="share-bottom-hint">扫码体验 · 测测你的投资星座</div>
                 </div>
             </div>
         `;
@@ -1556,8 +1556,11 @@ function openShareModal() {
             }
             container.innerHTML = html;
         })();
+        // ===== 新增：重新添加保存按钮 =====
+        addSaveButton();
     }, 300);
 }
+
 
         shareBtn.addEventListener('click', openShareModal);
         shareCloseBtn.addEventListener('click', closeShareModal);
