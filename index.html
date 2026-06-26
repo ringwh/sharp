@@ -1742,9 +1742,9 @@ ctx.drawImage(logo, logoX, 40, logoWidth, logoHeight);
         ctx.textBaseline = 'top';
         ctx.fillText('长按保存 · 分享你的投资星座', width/2, qrY + qrSize + 18);
         
-        // 转换为图片并回调
+                // 转换为图片并回调
         callback(canvas.toDataURL('image/png'));
-    }
+    }  // ← drawCard 函数结束
     
     logo.onload = checkComplete;
     logo.onerror = checkComplete;
@@ -1752,7 +1752,9 @@ ctx.drawImage(logo, logoX, 40, logoWidth, logoHeight);
     constellationImg.onerror = checkComplete;
     qrImg.onload = checkComplete;
     qrImg.onerror = checkComplete;
-// roundRect 辅助方法
+}  // ← generateCardImage 函数结束
+
+// roundRect 辅助方法（必须在 generateCardImage 外面）
 CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
     if (r > w/2) r = w/2;
     if (r > h/2) r = h/2;
@@ -1767,8 +1769,6 @@ CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
     this.quadraticCurveTo(x, y, x + r, y);
     return this;
 };
-
-
 
         // ============================================================
         //  15. 生成星星
