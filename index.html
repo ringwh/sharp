@@ -1457,21 +1457,104 @@
         //  14. 分享弹窗控制（修复版：直接显示，不截图替换）
         // ============================================================
         function openShareModal() {
-            if (state.resultConst) {
-                const data = CONSTELLATIONS[state.resultConst];
-                if (data) {
-                    document.getElementById('shareNameModal').textContent = state.resultConst + '座';
-                    document.getElementById('shareImageModal').src = 'images/' + state.resultConst + '.png';
-                }
-            }
-            shareOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+    // 先显示弹窗（卡片保持原样，不显示加载提示）
+    shareOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
 
-        function closeShareModal() {
-            shareOverlay.classList.remove('active');
-            document.body.style.overflow = '';
+    // 先把星座数据更新到卡片里
+    if (state.resultConst) {
+        const data = CONSTELLATIONS[state.resultConst];
+        if (data) {
+            document.getElementById('shareNameModal').textContent = state.resultConst + '座';
+            document.getElementById('shareImageModal').src = 'images/' + state.resultConst + '.png';
         }
+    }
+
+    // 保存原始卡片内容（用于恢复）
+    const originalContent = document.getElementById('shareCardInner').innerHTML;
+
+    // 等待图片加载完成后再截图
+    setTimeout(function() {
+        html2canvas(document.getElementById('shareCardInner'), {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: null,
+            width: 340,
+            logging: false,
+            allowTaint: true
+        }).then(function(canvas) {
+            // 把卡片内容替换成截图图片
+            const cardInner = document.getElementById('shareCardInner');
+            cardInner.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL('image/png');
+            img.style.width = '100%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
+            img.style.borderRadius = '16px';
+            // 图片下方加一行提示
+            const hint = document.createElement('div');
+            hint.style.cssText = 'text-align:center;color:rgba(255,255,255,0.4);font-size:12px;padding:10px 0 4px;letter-spacing:0.5px;';
+            hint.textContent = '长按保存完整卡片 · 分享你的投资星座';
+            cardInner.appendChild(img);
+            cardInner.appendChild(hint);
+        }).catch(function(err) {
+            console.warn('截图失败:', err);
+            // 如果截图失败，显示原始卡片
+            const cardInner = document.getElementById('shareCardInner');
+            cardInner.innerHTML = originalContent;
+        });
+    }, 300);
+}
+
+       function closeShareModal() {
+    shareOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+    // 恢复卡片为原始 HTML 结构
+    setTimeout(function() {
+        const cardInner = document.getElementById('shareCardInner');
+        cardInner.innerHTML = `
+            <div class="share-stars-modal" id="shareStarsModal"></div>
+            <div class="share-content">
+                <img class="share-top-logo" id="shareLogoTop" src="logo.png" alt="logo" onerror="this.style.display='none';document.getElementById('shareLogoTopPlaceholder').style.display='flex'" />
+                <div class="share-top-logo-placeholder" id="shareLogoTopPlaceholder" style="display:none;">LOGO</div>
+                <div class="share-guide">8道题测出你在投资上的星座</div>
+                <div class="share-label">我测出来是</div>
+                <div class="share-constellation" id="shareNameModal">——</div>
+                <img class="share-image" id="shareImageModal" src="" alt="星座" />
+                <div class="share-bottom">
+                    <img class="share-qr-large" id="shareQrLarge" src="qrcode.png" alt="二维码" onerror="this.style.display='none';document.getElementById('shareQrLargePlaceholder').style.display='flex'" />
+                    <div class="share-qr-placeholder" id="shareQrLargePlaceholder" style="display:none;">二维码</div>
+                    <div class="share-bottom-hint">长按保存 · 分享你的投资星座</div>
+                </div>
+            </div>
+        `;
+        // 重新生成星星
+        (function() {
+            const container = document.getElementById('shareStarsModal');
+            if (!container) return;
+            let html = '';
+            for (let i = 0; i < 50; i++) {
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = 1.2 + Math.random() * 2.5;
+                const dur = 2 + Math.random() * 4;
+                const delay = Math.random() * 5;
+                const opacity = 0.2 + Math.random() * 0.5;
+                html += `<div class="share-star-modal" style="
+                        left:${x}%;
+                        top:${y}%;
+                        width:${size}px;
+                        height:${size}px;
+                        --dur:${dur}s;
+                        --delay:${delay}s;
+                        opacity:${opacity};
+                    "></div>`;
+            }
+            container.innerHTML = html;
+        })();
+    }, 300);
+}
 
         shareBtn.addEventListener('click', openShareModal);
         shareCloseBtn.addEventListener('click', closeShareModal);
