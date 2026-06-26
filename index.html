@@ -1482,13 +1482,13 @@ function openShareModal() {
             btn.style.cssText = 'width:60%;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.15);border-radius:30px;padding:8px 0;color:#fff;font-size:12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;margin-top:12px;';
 btn.onclick = function() {
     const cardInner = document.getElementById('shareCardInner');
-    html2canvas(cardInner, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#0A1628',
-        logging: false,
-        allowTaint: true
-    }).then(function(canvas) {
+    html2canvas(document.querySelector('.share-modal .share-content'), {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#0A1628',
+    logging: false,
+    allowTaint: true
+}).then(function(canvas) {
         const link = document.createElement('a');
         link.download = '我的投资星座.png';
         link.href = canvas.toDataURL('image/png');
