@@ -1684,9 +1684,11 @@ function generateCardImage(callback) {
         });
         
         // 绘制 Logo（顶部居中）
-        const logoSize = 60;
-        const logoX = (width - logoSize) / 2;
-        ctx.drawImage(logo, logoX, 40, logoSize, logoSize);
+        // 绘制 Logo（保持原始宽高比）
+const logoWidth = 120;
+const logoHeight = logo.naturalHeight / logo.naturalWidth * logoWidth;
+const logoX = (width - logoWidth) / 2;
+ctx.drawImage(logo, logoX, 40, logoWidth, logoHeight);
         
         // 绘制标题
         ctx.fillStyle = '#FFFFFF';
