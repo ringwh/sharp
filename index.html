@@ -1470,43 +1470,48 @@ function openShareModal() {
         }
     }
 
-    // 检查卡片底部是否已有按钮，避免重复添加
-    const existingBtn = document.getElementById('shareSaveBtn');
-    if (!existingBtn) {
-        // 在卡片底部添加保存按钮
-const shareModal = document.querySelector('.share-modal');
-if (shareModal) {
-    const btn = document.createElement('button');
-    btn.id = 'shareSaveBtn';
-    btn.textContent = '保存到相册';
-    btn.style.cssText = 'width:80%;margin:12px auto 0;display:block;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.15);border-radius:30px;padding:10px 0;color:#fff;font-size:14px;cursor:pointer;';
-    btn.onclick = function() {
-        html2canvas(document.querySelector('.share-modal .share-content'), {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#0A1628',
-            logging: false,
-            allowTaint: true
-        }).then(function(canvas) {
-            const link = document.createElement('a');
-            link.download = '我的投资星座.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            btn.textContent = '已保存！';
-            setTimeout(function() {
-                btn.textContent = '保存到相册';
-            }, 1500);
-        }).catch(function(err) {
-            alert('保存失败，请重试');
-        });
-    };
-    shareModal.appendChild(btn);
-}
+    // 先移除旧按钮
+    const oldBtn = document.getElementById('shareSaveBtn');
+    if (oldBtn) oldBtn.remove();
+
+    // 在 share-modal 下添加按钮（在 share-content 外面）
+    const shareModal = document.querySelector('.share-modal');
+    if (shareModal) {
+        const btn = document.createElement('button');
+        btn.id = 'shareSaveBtn';
+        btn.textContent = '保存到相册';
+        btn.style.cssText = 'width:80%;margin:16px auto 0;display:block;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.15);border-radius:30px;padding:12px 0;color:#fff;font-size:15px;cursor:pointer;';
+        btn.onclick = function() {
+            html2canvas(document.querySelector('.share-modal .share-content'), {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#0A1628',
+                logging: false,
+                allowTaint: true
+            }).then(function(canvas) {
+                const link = document.createElement('a');
+                link.download = '我的投资星座.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                btn.textContent = '已保存！';
+                setTimeout(function() {
+                    btn.textContent = '保存到相册';
+                }, 1500);
+            }).catch(function(err) {
+                alert('保存失败，请重试');
+            });
+        };
+        shareModal.appendChild(btn);
     }
 }
       function closeShareModal() {
     shareOverlay.classList.remove('active');
     document.body.style.overflow = '';
+
+    // 移除按钮
+    const oldBtn = document.getElementById('shareSaveBtn');
+    if (oldBtn) oldBtn.remove();
+
     // 恢复卡片为原始 HTML 结构
     setTimeout(function() {
         const cardInner = document.getElementById('shareCardInner');
@@ -1522,7 +1527,7 @@ if (shareModal) {
                 <div class="share-bottom">
                     <img class="share-qr-large" id="shareQrLarge" src="qrcode.png" alt="二维码" onerror="this.style.display='none';document.getElementById('shareQrLargePlaceholder').style.display='flex'" />
                     <div class="share-qr-placeholder" id="shareQrLargePlaceholder" style="display:none;">二维码</div>
-                    <div class="share-bottom-hint">扫码体验 · 测测你的投资星座</div>
+                    <div class="share-bottom-hint">扫码测测你的投资星座</div>
                 </div>
             </div>
         `;
@@ -1550,8 +1555,6 @@ if (shareModal) {
             }
             container.innerHTML = html;
         })();
-        // ===== 新增：重新添加保存按钮 =====
-        addSaveButton();
     }, 300);
 }
 
