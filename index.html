@@ -1485,50 +1485,38 @@ function openShareModal() {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
     if (isMobile) {
-        // 手机端：用 html2canvas 生成完整卡片图片，显示在弹窗里让用户长按保存
-        const shareContent = document.querySelector('.share-modal .share-content');
-        html2canvas(shareContent, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#0A1628',
-            logging: false,
-            allowTaint: true
-        }).then(function(canvas) {
-            // 把弹窗内容替换成这张图片
-           // 把弹窗内容替换成这张图片
-const cardInner = document.getElementById('shareCardInner');
-cardInner.innerHTML = '';
-const img = document.createElement('img');
-img.src = canvas.toDataURL('image/png');
-img.style.width = '100%';
-img.style.height = 'auto';
-img.style.display = 'block';
-img.style.borderRadius = '16px';
-// 禁止子元素长按事件
-img.style.webkitTouchCallout = 'none';
-img.style.touchAction = 'none';
-img.style.userSelect = 'none';
-img.style.pointerEvents = 'auto';
-// 让图片可以长按保存
-img.style.webkitUserSelect = 'none';
-cardInner.appendChild(img);
-
-// 加一行提示（用文字，不是图片）
-const hint = document.createElement('div');
-hint.style.cssText = 'text-align:center;color:rgba(255,255,255,0.4);font-size:12px;padding:10px 0;pointer-events:none;user-select:none;';
-hint.textContent = '长按图片保存到相册';
-cardInner.appendChild(hint);
-            
-            // 把按钮文字改成“已生成”
-            btn.textContent = '已生成，请长按保存';
-            setTimeout(function() {
-                btn.textContent = '保存到相册';
-            }, 3000);
-        }).catch(function(err) {
-            alert('生成图片失败，请重试');
-        });
-        return;
-    }
+    const shareContent = document.querySelector('.share-modal .share-content');
+    html2canvas(shareContent, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#0A1628',
+        logging: false,
+        allowTaint: true
+    }).then(function(canvas) {
+        const cardInner = document.getElementById('shareCardInner');
+        cardInner.innerHTML = '';
+        
+        // 显示完整卡片图片（供长按保存）
+        const img = document.createElement('img');
+        img.src = canvas.toDataURL('image/png');
+        img.style.cssText = 'width:100%;height:auto;display:block;border-radius:16px;';
+        cardInner.appendChild(img);
+        
+        // 提示文字：引导长按
+        const hint = document.createElement('div');
+        hint.style.cssText = 'text-align:center;color:rgba(255,255,255,0.5);font-size:13px;padding:12px 0 4px;letter-spacing:0.5px;pointer-events:none;user-select:none;';
+        hint.textContent = '长按上方图片保存到相册';
+        cardInner.appendChild(hint);
+        
+        btn.textContent = '已生成，请长按保存';
+        setTimeout(function() {
+            btn.textContent = '保存到相册';
+        }, 3000);
+    }).catch(function(err) {
+        alert('生成图片失败，请重试');
+    });
+    return;
+}
     
     // 电脑端：直接下载
     html2canvas(document.querySelector('.share-modal .share-content'), {
