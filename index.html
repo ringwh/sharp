@@ -999,18 +999,6 @@
             <button class="close-btn" id="shareCloseBtn">✕</button>
             <div class="share-card-inner" id="shareCardInner">
                 <div class="share-stars-modal" id="shareStarsModal"></div>
-<!-- 用于截图的内容（隐藏，不显示） -->
-<div id="shareCardContent" style="position:absolute;left:-9999px;top:0;width:340px;padding:28px 22px 24px;background:linear-gradient(160deg,#0A1628 0%,#0B1A33 45%,#0D1F3C 100%);border-radius:28px;text-align:center;display:flex;flex-direction:column;align-items:center;">
-    <img src="logo.png" style="height:40px;width:auto;object-fit:contain;margin-bottom:6px;" />
-    <div style="font-size:20px;font-weight:700;color:#fff;letter-spacing:1px;margin-bottom:10px;">8道题测出你在投资上的星座</div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.35);letter-spacing:1px;">我测出来是</div>
-    <div style="font-size:38px;font-weight:700;color:#fff;letter-spacing:2px;line-height:1.2;" id="shareNameModalHidden">——</div>
-    <img id="shareImageModalHidden" src="" style="width:120px;height:120px;object-fit:contain;border-radius:14px;margin:4px auto;" />
-    <div style="margin-top:6px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;width:100%;display:flex;flex-direction:column;align-items:center;">
-        <img id="shareQrLargeHidden" src="qrcode.png" style="width:88px;height:88px;border-radius:8px;background:#fff;padding:4px;" />
-        <div style="font-size:12px;color:rgba(255,255,255,0.30);letter-spacing:0.5px;margin-top:8px;">长按保存 · 分享你的投资星座</div>
-    </div>
-</div>
                 <div class="share-content">
 
                     <!-- 顶部 Logo -->
@@ -1430,13 +1418,6 @@
 
                 // 同步分享弹窗数据
                 shareNameModal.textContent = resultConst + '座';
-              // 同步分享弹窗数据（显示版）
-shareNameModal.textContent = resultConst + '座';
-shareImageModal.src = `images/${resultConst}.png`;
-shareImageModal.alt = `${resultConst}座插画`;
-// 同步隐藏版数据（用于截图）
-document.getElementById('shareNameModalHidden').textContent = resultConst + '座';
-document.getElementById('shareImageModalHidden').src = `images/${resultConst}.png`;
                 shareImageModal.src = `images/${resultConst}.png`;
                 shareImageModal.alt = `${resultConst}座插画`;
             }
@@ -1476,7 +1457,7 @@ document.getElementById('shareImageModalHidden').src = `images/${resultConst}.pn
         // ============================================================
         //  14. 分享弹窗控制
         // ============================================================
-       function openShareModal() {
+        function openShareModal() {
     if (state.resultConst) {
         const data = CONSTELLATIONS[state.resultConst];
         if (data) {
@@ -1490,61 +1471,65 @@ document.getElementById('shareImageModalHidden').src = `images/${resultConst}.pn
     shareOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    // 延迟生成卡片截图
+    // 延迟生成卡片截图，确保 DOM 渲染完成
     setTimeout(function() {
-        // 使用隐藏的 #shareCardContent 来截图（不包含星星层）
-        const content = document.getElementById('shareCardContent');
-        if (!content) {
-            // 如果没有 #shareCardContent，回退到 #shareCardInner
-            var card = document.getElementById('shareCardInner');
-            if (!card) return;
-            doCapture(card);
-            return;
-        }
-        doCapture(content);
-    }, 300);
-}
-
-function doCapture(element) {
-    html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: null,
-        width: element.scrollWidth,
-        height: element.scrollHeight,
-        logging: false,
-        allowTaint: true
-    }).then(function(canvas) {
-        const cardInner = document.getElementById('shareCardInner');
-        if (!cardInner) return;
-        // 清空卡片内部
-        cardInner.innerHTML = '';
-        // 创建图片显示截图
-        const img = document.createElement('img');
-        img.src = canvas.toDataURL('image/png');
-        img.style.width = '100%';
-        img.style.height = 'auto';
-        img.style.display = 'block';
-        img.style.borderRadius = '16px';
-        // 添加提示
-        const hint = document.createElement('div');
-        hint.style.cssText = 'text-align:center;color:rgba(255,255,255,0.35);font-size:12px;padding:12px 0 4px;letter-spacing:0.5px;';
-        hint.textContent = '长按保存完整卡片 · 分享你的投资星座';
-        cardInner.appendChild(img);
-        cardInner.appendChild(hint);
-    }).catch(function(err) {
-        console.warn('截图失败:', err);
-        const cardInner = document.getElementById('shareCardInner');
-        if (cardInner) {
+        const card = document.getElementById('shareCardInner');
+        if (!card) return;
+        
+        // 移除二维码的 pointer-events: none 让截图正常
+        const qrImg = document.getElementById('shareQrLarge');
+        if (qrImg) qrImg.style.pointerEvents = 'none';
+        
+        html2canvas(card, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: null,
+            width: card.scrollWidth,
+            height: card.scrollHeight,
+            logging: false,
+            allowTaint: false,
+            useCORS: true
+        }).then(function(canvas) {
+            // 把卡片内容替换成截图图片
+            const cardInner = document.getElementById('shareCardInner');
+            // 清空卡片内部，只保留图片
+            cardInner.innerHTML = '';
+            // 创建一张图片显示截图
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL('image/png');
+            img.style.width = '100%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
+            img.style.borderRadius = '16px';
+            // 图片下方加一行提示
+            const hint = document.createElement('div');
+            hint.style.cssText = 'text-align:center;color:rgba(255,255,255,0.4);font-size:12px;padding:10px 0 4px;letter-spacing:0.5px;';
+            hint.textContent = '长按保存完整卡片 · 分享你的投资星座';
+            
+            // 重新添加关闭按钮（因为被清空了）
+            const closeBtn = document.querySelector('.share-modal .close-btn');
+            // 把图片和提示加到卡片里
+            cardInner.appendChild(img);
+            cardInner.appendChild(hint);
+            
+            // 关闭按钮还在，不用重新添加
+        }).catch(function(err) {
+            console.warn('截图失败:', err);
+            // 如果截图失败，显示提示
+            const cardInner = document.getElementById('shareCardInner');
             cardInner.innerHTML = '<div style="color:rgba(255,255,255,0.5);padding:40px 20px;text-align:center;">生成卡片失败，请重试</div>';
-        }
-    });
+        });
+    }, 300);
 }
 
        function closeShareModal() {
     shareOverlay.classList.remove('active');
     document.body.style.overflow = '';
-    // 不需要 reload，下次打开会重新截图
+    // 延迟重置卡片内容，让弹窗关闭后再恢复
+    setTimeout(function() {
+        // 重新加载页面或者直接刷新弹窗内容
+        location.reload(); // 简单粗暴，但能保证下次打开是原始卡片
+    }, 500);
 }
 
         shareBtn.addEventListener('click', openShareModal);
