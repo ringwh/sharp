@@ -1482,25 +1482,32 @@ function openShareModal() {
         btn.textContent = '保存到相册';
         btn.style.cssText = 'width:80%;margin:16px auto 0;display:block;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.15);border-radius:30px;padding:12px 0;color:#fff;font-size:15px;cursor:pointer;';
         btn.onclick = function() {
-            html2canvas(document.querySelector('.share-modal .share-content'), {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#0A1628',
-                logging: false,
-                allowTaint: true
-            }).then(function(canvas) {
-                const link = document.createElement('a');
-                link.download = '我的投资星座.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                btn.textContent = '已保存！';
-                setTimeout(function() {
-                    btn.textContent = '保存到相册';
-                }, 1500);
-            }).catch(function(err) {
-                alert('保存失败，请重试');
-            });
-        };
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        alert('请长按上方图片，选择"保存到相册"');
+        return;
+    }
+    
+    html2canvas(document.querySelector('.share-modal .share-content'), {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#0A1628',
+        logging: false,
+        allowTaint: true
+    }).then(function(canvas) {
+        const link = document.createElement('a');
+        link.download = '我的投资星座.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        btn.textContent = '已保存！';
+        setTimeout(function() {
+            btn.textContent = '保存到相册';
+        }, 1500);
+    }).catch(function(err) {
+        alert('保存失败，请重试');
+    });
+};
         shareModal.appendChild(btn);
     }
 }
