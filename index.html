@@ -1659,13 +1659,20 @@ function generateCardImage(callback) {
     }
     
     function drawCard() {
-        // 清空画布，重新绘制背景
-        const gradient = ctx.createLinearGradient(0, 0, 0, height);
-        gradient.addColorStop(0, '#0A1628');
-        gradient.addColorStop(0.5, '#0B1A33');
-        gradient.addColorStop(1, '#0D1F3C');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, width, height);
+    // 第一步：强制铺满不透明背景（解决透明边）
+    ctx.fillStyle = '#0A1628';
+    ctx.fillRect(0, 0, width, height);
+    
+    // 第二步：渐变背景（叠在上面）
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, '#0A1628');
+    gradient.addColorStop(0.5, '#0B1A33');
+    gradient.addColorStop(1, '#0D1F3C');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    
+    // ... 后面是星星、logo、文字、插画、二维码 ...
+}
         
         // 重新画星星
         starPositions.forEach(function(pos) {
