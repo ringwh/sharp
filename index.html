@@ -1020,7 +1020,7 @@
                     <div class="share-bottom">
     <img class="share-qr-large" id="shareQrLarge" src="qrcode.png" alt="二维码" onerror="this.style.display='none';document.getElementById('shareQrLargePlaceholder').style.display='flex'" />
     <div class="share-qr-placeholder" id="shareQrLargePlaceholder" style="display:none;">二维码</div>
-    <div class="share-bottom-hint">长按保存 · 分享你的投资星座</div>
+    <div class="share-bottom-hint">扫码测测你的投资星座</div>
 </div>
 <div class="share-actions">
     <div class="save-hint" id="saveCardBtn">长按保存完整卡片</div>
@@ -1456,12 +1456,12 @@
         // ============================================================
         //  14. 分享弹窗控制（修复版：直接显示，不截图替换）
         // ============================================================
-        function openShareModal() {
-    // 先显示弹窗（卡片保持原样，不显示加载提示）
+function openShareModal() {
+    // 显示弹窗
     shareOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    // 先把星座数据更新到卡片里
+    // 更新星座数据
     if (state.resultConst) {
         const data = CONSTELLATIONS[state.resultConst];
         if (data) {
@@ -1470,43 +1470,46 @@
         }
     }
 
-    // 保存原始卡片内容（用于恢复）
-    const originalContent = document.getElementById('shareCardInner').innerHTML;
-
-    // 等待图片加载完成后再截图
-    setTimeout(function() {
-        html2canvas(document.getElementById('shareCardInner'), {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: null,
-            width: 340,
-            logging: false,
-            allowTaint: true
-        }).then(function(canvas) {
-            // 把卡片内容替换成截图图片
-            const cardInner = document.getElementById('shareCardInner');
-            cardInner.innerHTML = '';
-            const img = document.createElement('img');
-            img.src = canvas.toDataURL('image/png');
-            img.style.width = '100%';
-            img.style.height = 'auto';
-            img.style.display = 'block';
-            img.style.borderRadius = '16px';
-            // 图片下方加一行提示
-            const hint = document.createElement('div');
-            hint.style.cssText = 'text-align:center;color:rgba(255,255,255,0.4);font-size:12px;padding:10px 0 4px;letter-spacing:0.5px;';
-            hint.textContent = '长按保存完整卡片 · 分享你的投资星座';
-            cardInner.appendChild(img);
-            cardInner.appendChild(hint);
-        }).catch(function(err) {
-            console.warn('截图失败:', err);
-            // 如果截图失败，显示原始卡片
-            const cardInner = document.getElementById('shareCardInner');
-            cardInner.innerHTML = originalContent;
-        });
-    }, 300);
+    // 检查卡片底部是否已有按钮，避免重复添加
+    const existingBtn = document.getElementById('shareSaveBtn');
+    if (!existingBtn) {
+        // 在卡片底部添加保存按钮
+        const shareBottom = document.querySelector('.share-modal .share-bottom');
+        if (shareBottom) {
+            const btn = document.createElement('button');
+            btn.id = 'shareSaveBtn';
+            btn.textContent = '保存到相册';
+            btn.style.cssText = 'width:60%;background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.15);border-radius:30px;padding:8px 0;color:#fff;font-size:12px;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px;margin-top:12px;';
+            btn.onclick = function() {
+                // 点击按钮时截图并保存
+                const cardInner = document.getElementById('shareCardInner');
+                html2canvas(cardInner, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: null,
+                    width: 340,
+                    logging: false,
+                    allowTaint: true
+                }).then(function(canvas) {
+                    const link = document.createElement('a');
+                    link.download = '我的投资星座.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    btn.textContent = '✅ 已保存！';
+                    btn.style.borderColor = 'rgba(100,255,100,0.3)';
+                    setTimeout(function() {
+                        btn.textContent = '💾 保存到相册';
+                        btn.style.borderColor = 'rgba(255,255,255,0.15)';
+                    }, 1500);
+                }).catch(function(err) {
+                    console.warn('截图失败:', err);
+                    alert('保存失败，请重试');
+                });
+            };
+            shareBottom.appendChild(btn);
+        }
+    }
 }
-
        function closeShareModal() {
     shareOverlay.classList.remove('active');
     document.body.style.overflow = '';
