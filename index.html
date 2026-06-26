@@ -1484,58 +1484,46 @@ function openShareModal() {
         btn.onclick = function() {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
-    if (isMobile) {
-    html2canvas(document.getElementById('shareCardInner'), {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: 'null',
-        logging: false,
-        allowTaint: true
-    }).then(function(canvas) {
+   if (isMobile) {
+    generateCardImage(function(imageData) {
+        if (!imageData) {
+            alert('生成图片失败，请重试');
+            return;
+        }
         const cardInner = document.getElementById('shareCardInner');
         cardInner.innerHTML = '';
-        
-        // 显示完整卡片图片（供长按保存）
         const img = document.createElement('img');
-        img.src = canvas.toDataURL('image/png');
+        img.src = imageData;
         img.style.cssText = 'width:100%;height:auto;display:block;border-radius:16px;';
         cardInner.appendChild(img);
-        
-        // 提示文字：引导长按
         const hint = document.createElement('div');
-        hint.style.cssText = 'text-align:center;color:rgba(255,255,255,0.5);font-size:13px;padding:12px 0 4px;letter-spacing:0.5px;pointer-events:none;user-select:none;';
+        hint.style.cssText = 'text-align:center;color:rgba(255,255,255,0.5);font-size:13px;padding:12px 0 4px;pointer-events:none;user-select:none;';
         hint.textContent = '长按上方图片保存到相册';
         cardInner.appendChild(hint);
-        
         btn.textContent = '已生成，请长按保存';
         setTimeout(function() {
             btn.textContent = '保存到相册';
         }, 3000);
-    }).catch(function(err) {
-        alert('生成图片失败，请重试');
     });
     return;
 }
     
     // 电脑端：直接下载
-    html2canvas(document.getElementById('shareCardInner'), {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: 'null',
-        logging: false,
-        allowTaint: true
-    }).then(function(canvas) {
-        const link = document.createElement('a');
-        link.download = '我的投资星座.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        btn.textContent = '已保存！';
-        setTimeout(function() {
-            btn.textContent = '保存到相册';
-        }, 1500);
-    }).catch(function(err) {
-        alert('保存失败，请重试');
-    });
+     // 电脑端：直接下载（用 generateCardImage）
+generateCardImage(function(imageData) {
+    if (!imageData) {
+        alert('生成图片失败，请重试');
+        return;
+    }
+    const link = document.createElement('a');
+    link.download = '我的投资星座.png';
+    link.href = imageData;
+    link.click();
+    btn.textContent = '已保存！';
+    setTimeout(function() {
+        btn.textContent = '保存到相册';
+    }, 1500);
+});
 };
         shareModal.appendChild(btn);
     }
